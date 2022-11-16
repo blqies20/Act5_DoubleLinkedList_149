@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Security.Cryptography.X509Certificates;
 
 namespace DoubleLinkedList
 {
@@ -35,18 +36,111 @@ namespace DoubleLinkedList
             {
                 if ((START != null) && (rollNo == START.rollNumber))
                 {
-                    Console.WriteLine("\nDuplicate roll numbers not allowed");
-                    return;
                     {
-                        newnode.next = START;
-                        if (START != null)
-                            START.prev = newnode;
-                        newnode.prev = null;
-                        START = newnode;
+                        Console.WriteLine("\nDuplicate roll numbers not allowed");
+                        return;
+                    }
+                    newnode.next = START;
+                    if (START != null)
+                        START.prev = newnode;
+                    newnode.prev = null;
+                    START = newnode;
+                    return;
+                }
+                Node previous, curent;
+                for (curent = previous = START; curent != null && rollNo >= curent.rollNumber; previous = curent, curent = curent.next)
+                {
+                    if (rollNo == curent.rollNumber)
+                    {
+                        Console.WriteLine("\nDuplicate roll numbers not alowed");
                         return;
                     }
                 }
+                /*On the execution of the above for loop, prev and
+                 * current will point to those nodes between which the new node is to be inserted.*/
+                newnode.next = curent;
+                newnode.prev = previous;
+
+                /*If the node is to be inserted at the end of the list.*/
+                if (curent == null)
+                {
+                    newnode.next = null;
+                    previous.next = newnode;
+                    return;
+                }
+                curent.prev = newnode;
+                previous.next = newnode;
             }
+        }
+        /*Checks wheteher the specified node is present*/
+        public bool Search(int rollNo, ref Node previous, ref Node current)
+        {
+            for(previous = current = START; current != null && rollNo != current.rollNumber; previous = current, current = current.next)
+            { }
+            /*The above for loop traverses the list. If the specified node
+             * is found then the function returns true, otherwise false.*/
+            return (current != null);
+        }
+        public bool delNode(int rollNo)/*Deletes the specified node*/
+        {
+            Node previous, current;
+            previous = current = null;
+            if (Search(rollNo, ref previous, ref current) == false)
+                return false;
+            if (current == START) /*If the first node is to be deleted*/
+            {
+                START = START.next;
+                if (START != null)
+                    START.prev = null;
+                return true;
+            }
+            if (current.next == null)/*If the last node is to be deleted*/
+            {
+                previous.next = null;
+                return true;
+            }
+            /*If the node to be deleted is in between the list then the following lines of code is executed*/
+            previous.next = current.next;
+            current.next.prev = previous;
+            return true;
+        }
+        public void traverse()/*Traverse the list*/
+        {
+            if (listEmpty())
+                Console.WriteLine("\nList is empty");
+            else
+            {
+                Console.WriteLine("\nRecords in the ascending order of "+"roll numbers are:\n");
+                Node currentNode;
+                for (currentNode = START; currentNode != null; currentNode = currentNode.next)
+                    Console.Write(currentNode.rollNumber + "  " + currentNode.name + "\n");
+            }
+        }
+        /*traverse the list in the reverse direction*/
+        public void retraverse()
+        {
+            if (listEmpty())
+                Console.WriteLine("\nList is empty");
+            else
+            {
+                Console.WriteLine("/nRecords in the descending order of "+"roll numbers are:\n");
+                Node currentNode;
+                for (currentNode = START; currentNode != null; currentNode = currentNode.next)
+                { }
+                while (currentNode != null)
+                {
+                    Console.Write(currentNode.rollNumber + "  " + currentNode.name + "\n");
+                    currentNode = currentNode.prev;
+                }
+            }
+        }
+        public bool listEmpty()
+        {
+            if (START == null)
+                return true;
+            else
+                return false;
         }
     }
 }
+
